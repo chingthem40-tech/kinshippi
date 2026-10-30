@@ -1,0 +1,272 @@
+{
+  "entities": {
+    "AdmissionApplication": {
+      "title": "Admission Application",
+      "description": "Student registration inquiry for prospective admission to Kinship High School",
+      "type": "object",
+      "properties": {
+        "studentName": {
+          "type": "string",
+          "description": "Full name of the student applying",
+          "minLength": 2,
+          "maxLength": 100
+        },
+        "parentName": {
+          "type": "string",
+          "description": "Full name of the parent or guardian",
+          "minLength": 2,
+          "maxLength": 100
+        },
+        "parentPhone": {
+          "type": "string",
+          "description": "Contact telephone number of parent",
+          "minLength": 8,
+          "maxLength": 20
+        },
+        "parentEmail": {
+          "type": "string",
+          "description": "Email address of parent",
+          "maxLength": 100
+        },
+        "classApplying": {
+          "type": "string",
+          "description": "Grade level applying for (e.g. Nursery, Class VI, Class IX)",
+          "minLength": 2,
+          "maxLength": 30
+        },
+        "gender": {
+          "type": "string",
+          "description": "Student gender",
+          "enum": ["Male", "Female", "Other"]
+        },
+        "previousSchool": {
+          "type": "string",
+          "description": "Name and location of previous school attended",
+          "maxLength": 150
+        },
+        "residentialArea": {
+          "type": "string",
+          "description": "Locality or village in Churachandpur",
+          "maxLength": 120
+        },
+        "status": {
+          "type": "string",
+          "description": "Current processing stage of the admission record",
+          "enum": ["pending", "under_review", "contacted", "approved", "rejected"]
+        },
+        "notes": {
+          "type": "string",
+          "description": "Additional remarks or questions from parent",
+          "maxLength": 300
+        },
+        "applicantUid": {
+          "type": "string",
+          "description": "UID of the logged in user if authenticated, or 'anonymous'",
+          "maxLength": 128
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp of application submission"
+        }
+      },
+      "required": ["studentName", "parentName", "parentPhone", "classApplying", "status", "createdAt"]
+    },
+    "TourBooking": {
+      "title": "Tour Booking",
+      "description": "Saturday campus visit slot reservation",
+      "type": "object",
+      "properties": {
+        "parentName": {
+          "type": "string",
+          "description": "Name of visiting parent",
+          "minLength": 2,
+          "maxLength": 100
+        },
+        "phone": {
+          "type": "string",
+          "description": "Contact telephone number",
+          "minLength": 8,
+          "maxLength": 20
+        },
+        "email": {
+          "type": "string",
+          "description": "Contact email address",
+          "maxLength": 100
+        },
+        "preferredSaturday": {
+          "type": "string",
+          "description": "Target Saturday date string",
+          "minLength": 5,
+          "maxLength": 60
+        },
+        "childGrade": {
+          "type": "string",
+          "description": "Prospective class grade of the child",
+          "maxLength": 30
+        },
+        "numberOfAttendees": {
+          "type": "integer",
+          "description": "Number of family members attending tour"
+        },
+        "status": {
+          "type": "string",
+          "description": "Status of the scheduled tour",
+          "enum": ["scheduled", "completed", "cancelled"]
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Timestamp of tour reservation"
+        }
+      },
+      "required": ["parentName", "phone", "preferredSaturday", "status", "createdAt"]
+    },
+    "SchoolCircular": {
+      "title": "School Circular",
+      "description": "Official institutional announcement or notice",
+      "type": "object",
+      "properties": {
+        "title": {
+          "type": "string",
+          "description": "Headline of notice",
+          "minLength": 3,
+          "maxLength": 150
+        },
+        "category": {
+          "type": "string",
+          "description": "Notice category",
+          "enum": ["Academic", "Examination", "Sports", "Holiday", "Notice"]
+        },
+        "date": {
+          "type": "string",
+          "description": "Display date for publication",
+          "maxLength": 50
+        },
+        "content": {
+          "type": "string",
+          "description": "Full text of bulletin announcement",
+          "minLength": 5,
+          "maxLength": 1000
+        },
+        "priority": {
+          "type": "string",
+          "description": "Urgency rating",
+          "enum": ["normal", "urgent"]
+        },
+        "authorEmail": {
+          "type": "string",
+          "description": "Email of author or administrator",
+          "maxLength": 100
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Timestamp when circular was published"
+        }
+      },
+      "required": ["title", "category", "date", "content", "priority", "createdAt"]
+    },
+    "FacilityUpgrade": {
+      "title": "Facility Upgrade Highlight",
+      "description": "Dynamic hostel and campus amenity highlight or upgrade showcase item",
+      "type": "object",
+      "properties": {
+        "title": {
+          "type": "string",
+          "description": "Headline of the facility upgrade or amenity",
+          "minLength": 2,
+          "maxLength": 100
+        },
+        "category": {
+          "type": "string",
+          "description": "Facility category or wing",
+          "enum": ["Hostel Wing", "Hygiene & Dining", "Study & Tech", "Sports & Rec", "Safety & Health"]
+        },
+        "description": {
+          "type": "string",
+          "description": "Summary of feature details and student benefit",
+          "minLength": 5,
+          "maxLength": 500
+        },
+        "iconName": {
+          "type": "string",
+          "description": "Lucide icon identifier",
+          "minLength": 2,
+          "maxLength": 40
+        },
+        "badgeText": {
+          "type": "string",
+          "description": "Pill tag or upgrade status badge",
+          "maxLength": 40
+        },
+        "authorEmail": {
+          "type": "string",
+          "description": "Email address of the administrator who added the highlight",
+          "maxLength": 100
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp of highlight addition"
+        }
+      },
+      "required": ["title", "category", "description", "iconName", "createdAt"]
+    },
+    "UserProfile": {
+      "title": "User Profile",
+      "description": "Public profile info for authenticated parents and faculty members",
+      "type": "object",
+      "properties": {
+        "uid": {
+          "type": "string",
+          "description": "Firebase Auth UID",
+          "maxLength": 128
+        },
+        "email": {
+          "type": "string",
+          "description": "User email address",
+          "maxLength": 100
+        },
+        "displayName": {
+          "type": "string",
+          "description": "Display name of user",
+          "maxLength": 100
+        },
+        "role": {
+          "type": "string",
+          "description": "Role in the school portal",
+          "enum": ["parent", "faculty", "admin"]
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Registration timestamp"
+        }
+      },
+      "required": ["uid", "email", "role", "createdAt"]
+    }
+  },
+  "firestore": {
+    "/admissions/{admissionId}": {
+      "schema": "AdmissionApplication",
+      "description": "Collection of student admission registration forms submitted by parents"
+    },
+    "/tour_bookings/{bookingId}": {
+      "schema": "TourBooking",
+      "description": "Collection of Saturday campus tour reservations"
+    },
+    "/circulars/{circularId}": {
+      "schema": "SchoolCircular",
+      "description": "Collection of official school notices and announcements"
+    },
+    "/facility_upgrades/{upgradeId}": {
+      "schema": "FacilityUpgrade",
+      "description": "Collection of dynamic hostel and amenity highlights managed by admin"
+    },
+    "/users/{userId}": {
+      "schema": "UserProfile",
+      "description": "Collection of authenticated user profiles for parents and staff"
+    }
+  }
+}

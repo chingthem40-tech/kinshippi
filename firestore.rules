@@ -1,0 +1,187 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // 1. GLOBAL SAFETY NET: Default deny catch-all
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // HELPER FUNCTIONS
+    function isValidId(id) {
+      return id is string && id.size() > 0 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    // Admin helper: check if user is the bootstrapped admin email or in admins collection
+    function isAdmin() {
+      return isSignedIn() && (
+        (request.auth.token.email == 'boichung094@gmail.com' && request.auth.token.email_verified == true) ||
+        exists(/databases/$(database)/documents/admins/$(request.auth.uid))
+      );
+    }
+
+    // VALIDATION BLUEPRINTS
+    function isValidAdmission(data) {
+      return data.keys().hasAll(['studentName', 'parentName', 'parentPhone', 'classApplying', 'status', 'createdAt']) &&
+        data.keys().hasOnly(['studentName', 'parentName', 'parentPhone', 'parentEmail', 'classApplying', 'gender', 'previousSchool', 'residentialArea', 'status', 'notes', 'applicantUid', 'createdAt']) &&
+        data.studentName is string && data.studentName.size() >= 2 && data.studentName.size() <= 100 &&
+        data.parentName is string && data.parentName.size() >= 2 && data.parentName.size() <= 100 &&
+        data.parentPhone is string && data.parentPhone.size() >= 8 && data.parentPhone.size() <= 20 &&
+        data.classApplying is string && data.classApplying.size() >= 2 && data.classApplying.size() <= 30 &&
+        data.status in ['pending', 'under_review', 'contacted', 'approved', 'rejected'] &&
+        (!('notes' in data) || (data.notes is string && data.notes.size() <= 300)) &&
+        (!('parentEmail' in data) || (data.parentEmail is string && data.parentEmail.size() <= 100)) &&
+        (!('gender' in data) || (data.gender is string && data.gender in ['Male', 'Female', 'Other'])) &&
+        (!('previousSchool' in data) || (data.previousSchool is string && data.previousSchool.size() <= 150)) &&
+        (!('residentialArea' in data) || (data.residentialArea is string && data.residentialArea.size() <= 120)) &&
+        (!('applicantUid' in data) || (data.applicantUid is string && data.applicantUid.size() <= 128));
+    }
+
+    function isValidTourBooking(data) {
+      return data.keys().hasAll(['parentName', 'phone', 'preferredSaturday', 'status', 'createdAt']) &&
+        data.keys().hasOnly(['parentName', 'phone', 'email', 'preferredSaturday', 'childGrade', 'numberOfAttendees', 'status', 'createdAt']) &&
+        data.parentName is string && data.parentName.size() >= 2 && data.parentName.size() <= 100 &&
+        data.phone is string && data.phone.size() >= 8 && data.phone.size() <= 20 &&
+        data.preferredSaturday is string && data.preferredSaturday.size() >= 5 && data.preferredSaturday.size() <= 60 &&
+        data.status in ['scheduled', 'completed', 'cancelled'] &&
+        (!('email' in data) || (data.email is string && data.email.size() <= 100)) &&
+        (!('childGrade' in data) || (data.childGrade is string && data.childGrade.size() <= 30)) &&
+        (!('numberOfAttendees' in data) || (data.numberOfAttendees is int && data.numberOfAttendees >= 1 && data.numberOfAttendees <= 20));
+    }
+
+    function isValidCircular(data) {
+      return data.keys().hasAll(['title', 'category', 'date', 'content', 'priority', 'createdAt']) &&
+        data.keys().hasOnly(['title', 'category', 'date', 'content', 'priority', 'authorEmail', 'createdAt']) &&
+        data.title is string && data.title.size() >= 3 && data.title.size() <= 150 &&
+        data.category in ['Academic', 'Examination', 'Sports', 'Holiday', 'Notice'] &&
+        data.date is string && data.date.size() <= 50 &&
+        data.content is string && data.content.size() >= 5 && data.content.size() <= 1000 &&
+        data.priority in ['normal', 'urgent'] &&
+        (!('authorEmail' in data) || (data.authorEmail is string && data.authorEmail.size() <= 100));
+    }
+
+    function isValidFacilityUpgrade(data) {
+      return data.keys().hasAll(['title', 'category', 'description', 'iconName', 'createdAt']) &&
+        data.keys().hasOnly(['title', 'category', 'description', 'iconName', 'badgeText', 'authorEmail', 'createdAt']) &&
+        data.title is string && data.title.size() >= 2 && data.title.size() <= 100 &&
+        data.category in ['Hostel Wing', 'Hygiene & Dining', 'Study & Tech', 'Sports & Rec', 'Safety & Health'] &&
+        data.description is string && data.description.size() >= 5 && data.description.size() <= 500 &&
+        data.iconName is string && data.iconName.size() >= 2 && data.iconName.size() <= 40 &&
+        (!('badgeText' in data) || (data.badgeText is string && data.badgeText.size() <= 40)) &&
+        (!('authorEmail' in data) || (data.authorEmail is string && data.authorEmail.size() <= 100));
+    }
+
+    function isValidUserProfile(data) {
+      return data.keys().hasAll(['uid', 'email', 'role', 'createdAt']) &&
+        data.keys().hasOnly(['uid', 'email', 'displayName', 'role', 'photoURL', 'createdAt']) &&
+        data.uid is string && data.uid.size() <= 128 &&
+        data.email is string && data.email.size() <= 100 &&
+        data.role in ['parent', 'faculty', 'admin'] &&
+        (!('displayName' in data) || (data.displayName is string && data.displayName.size() <= 100)) &&
+        (!('photoURL' in data) || (data.photoURL is string && data.photoURL.size() <= 500));
+    }
+
+    // 2. ADMISSIONS COLLECTION
+    match /admissions/{admissionId} {
+      allow get: if isValidId(admissionId) && (isAdmin() || (isSignedIn() && resource.data.applicantUid == request.auth.uid));
+      allow list: if isAdmin() || (isSignedIn() && resource.data.applicantUid == request.auth.uid);
+      allow create: if isValidId(admissionId) &&
+        isValidAdmission(incoming()) &&
+        incoming().status == 'pending' &&
+        incoming().createdAt == request.time;
+      allow update: if isValidId(admissionId) &&
+        isAdmin() &&
+        isValidAdmission(incoming()) &&
+        incoming().createdAt == existing().createdAt &&
+        incoming().diff(existing()).affectedKeys().hasOnly(['status', 'notes']);
+      allow delete: if isValidId(admissionId) && isAdmin();
+    }
+
+    // 3. TOUR BOOKINGS COLLECTION
+    match /tour_bookings/{bookingId} {
+      allow get: if isValidId(bookingId) && isAdmin();
+      allow list: if isAdmin();
+      allow create: if isValidId(bookingId) &&
+        isValidTourBooking(incoming()) &&
+        incoming().status == 'scheduled' &&
+        incoming().createdAt == request.time;
+      allow update: if isValidId(bookingId) &&
+        isAdmin() &&
+        isValidTourBooking(incoming()) &&
+        incoming().createdAt == existing().createdAt &&
+        incoming().diff(existing()).affectedKeys().hasOnly(['status']);
+      allow delete: if isValidId(bookingId) && isAdmin();
+    }
+
+    // 4. CIRCULARS & NOTICES COLLECTION (Public announcements)
+    match /circulars/{circularId} {
+      allow get: if isValidId(circularId);
+      allow list: if true;
+      allow create: if isValidId(circularId) &&
+        isAdmin() &&
+        isValidCircular(incoming()) &&
+        incoming().createdAt == request.time;
+      allow update: if isValidId(circularId) &&
+        isAdmin() &&
+        isValidCircular(incoming()) &&
+        incoming().createdAt == existing().createdAt &&
+        incoming().diff(existing()).affectedKeys().hasOnly(['title', 'category', 'date', 'content', 'priority']);
+      allow delete: if isValidId(circularId) && isAdmin();
+    }
+
+    // 5. FACILITY UPGRADES COLLECTION (Public highlights, admin managed)
+    match /facility_upgrades/{upgradeId} {
+      allow get: if isValidId(upgradeId);
+      allow list: if true;
+      allow create: if isValidId(upgradeId) &&
+        isAdmin() &&
+        isValidFacilityUpgrade(incoming()) &&
+        incoming().createdAt == request.time;
+      allow update: if isValidId(upgradeId) &&
+        isAdmin() &&
+        isValidFacilityUpgrade(incoming()) &&
+        incoming().createdAt == existing().createdAt &&
+        incoming().diff(existing()).affectedKeys().hasOnly(['title', 'category', 'description', 'iconName', 'badgeText']);
+      allow delete: if isValidId(upgradeId) && isAdmin();
+    }
+
+    // 5. USER PROFILES
+    match /users/{userId} {
+      allow get: if isValidId(userId) && isSignedIn() && (request.auth.uid == userId || isAdmin());
+      allow list: if isAdmin();
+      allow create: if isValidId(userId) &&
+        isSignedIn() &&
+        request.auth.uid == userId &&
+        isValidUserProfile(incoming()) &&
+        incoming().uid == request.auth.uid &&
+        (incoming().role != 'admin' || isAdmin()) &&
+        incoming().createdAt == request.time;
+      allow update: if isValidId(userId) &&
+        isSignedIn() &&
+        request.auth.uid == userId &&
+        incoming().uid == existing().uid &&
+        incoming().createdAt == existing().createdAt &&
+        incoming().role == existing().role &&
+        incoming().diff(existing()).affectedKeys().hasOnly(['displayName', 'photoURL']);
+      allow delete: if isValidId(userId) && (request.auth.uid == userId || isAdmin());
+    }
+
+    // 6. ADMINS COLLECTION (Only read by authenticated users)
+    match /admins/{adminId} {
+      allow read: if isSignedIn();
+      allow write: if false;
+    }
+  }
+}

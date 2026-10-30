@@ -1,0 +1,38 @@
+@import "tailwindcss";
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  --font-serif: "Newsreader", Georgia, serif;
+  --font-sans: "Figtree", system-ui, -apple-system, sans-serif;
+}
+
+:root {
+  --school-hero: #0c1760;
+  --school-red: #c8161d;
+  --school-gold: #fbc81e;
+  font-family: "Figtree", system-ui, -apple-system, sans-serif;
+}
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 80px;
+}
+
+h1, h2, h3, .font-editorial {
+  font-family: "Newsreader", Georgia, serif;
+}
+
+@keyframes marquee {
+  0% { transform: translateX(100%); }
+  100% { transform: translateX(-100%); }
+}
+
+.animate-marquee {
+  display: inline-block;
+  white-space: nowrap;
+  animation: marquee 32s linear infinite;
+}
+
+.animate-marquee:hover {
+  animation-play-state: paused;
+}
