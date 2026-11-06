@@ -56,7 +56,7 @@ export const StudentYearlyDataModal: React.FC<Props> = ({ isOpen, onClose }) => 
                 Student Yearly Academic & Enrollment Archive
               </h2>
               <p className="text-xs text-blue-200">
-                Annual BOSEM Examination Performance & Class-Wise Strength (1994–2026)
+                Annual BOSEM Examination Performance & Class Strength · U-DISE: {SCHOOL_INFO.udiseCode} (1994–2026)
               </p>
             </div>
           </div>
@@ -310,36 +310,38 @@ export const StudentYearlyDataModal: React.FC<Props> = ({ isOpen, onClose }) => 
                     Attendance: {selectedStudentYear.attendanceRate}% (Compliant)
                   </span>
                 </div>
-                <table className="w-full text-left text-xs">
-                  <thead className="bg-slate-50/60 dark:bg-slate-800/30 text-slate-500 border-b border-slate-200 dark:border-slate-800">
-                    <tr>
-                      <th className="py-2.5 px-3">Subject</th>
-                      <th className="py-2.5 px-3 font-mono">Annual Score (100)</th>
-                      <th className="py-2.5 px-3">Letter Grade</th>
-                      <th className="py-2.5 px-3 text-right">BOSEM Evaluation</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
-                    {selectedStudentYear.subjects.map((sub, idx) => (
-                      <tr key={idx} className="hover:bg-slate-50/80 dark:hover:bg-slate-800/40">
-                        <td className="py-2.5 px-3 font-semibold text-slate-900 dark:text-white">
-                          {sub.subject}
-                        </td>
-                        <td className="py-2.5 px-3 font-mono font-bold">
-                          {sub.marks}
-                        </td>
-                        <td className="py-2.5 px-3">
-                          <span className="px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 font-bold text-[10px]">
-                            {sub.grade}
-                          </span>
-                        </td>
-                        <td className="py-2.5 px-3 text-right text-slate-500">
-                          {sub.marks >= 80 ? "Distinction / Letter Mark" : "First Class Mastery"}
-                        </td>
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left text-xs min-w-[480px] sm:min-w-full">
+                    <thead className="bg-slate-50/60 dark:bg-slate-800/30 text-slate-500 border-b border-slate-200 dark:border-slate-800">
+                      <tr>
+                        <th className="py-2.5 px-3">Subject</th>
+                        <th className="py-2.5 px-3 font-mono">Annual Score (100)</th>
+                        <th className="py-2.5 px-3">Letter Grade</th>
+                        <th className="py-2.5 px-3 text-right">BOSEM Evaluation</th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
+                    </thead>
+                    <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
+                      {selectedStudentYear.subjects.map((sub, idx) => (
+                        <tr key={idx} className="hover:bg-slate-50/80 dark:hover:bg-slate-800/40">
+                          <td className="py-2.5 px-3 font-semibold text-slate-900 dark:text-white">
+                            {sub.subject}
+                          </td>
+                          <td className="py-2.5 px-3 font-mono font-bold">
+                            {sub.marks}
+                          </td>
+                          <td className="py-2.5 px-3">
+                            <span className="px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 font-bold text-[10px]">
+                              {sub.grade}
+                            </span>
+                          </td>
+                          <td className="py-2.5 px-3 text-right text-slate-500">
+                            {sub.marks >= 80 ? "Distinction / Letter Mark" : "First Class Mastery"}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
               </div>
 
               {/* Promotion Certificate Card */}

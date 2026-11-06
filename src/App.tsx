@@ -22,6 +22,7 @@ import { ProspectusModal } from './components/ProspectusModal';
 import { CampusLifeGallery } from './components/CampusLifeGallery';
 import { StudentYearlyDataModal } from './components/StudentYearlyDataModal';
 import { HostelFacilityUpgrades } from './components/HostelFacilityUpgrades';
+import { SchoolRulesSection } from './components/SchoolRulesSection';
 import { useAuth } from './context/AuthContext';
 import { 
   submitAdmissionApplication, 
@@ -73,7 +74,6 @@ export default function App() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [activeStageId, setActiveStageId] = useState<string>('prep');
   const [activePrayerTab, setActivePrayerTab] = useState<'anthem' | 'morning' | 'evening' | 'lords'>('anthem');
-  const [rulesSearch, setRulesSearch] = useState('');
 
   // Tour Booking Form State
   const [tourName, setTourName] = useState('');
@@ -182,62 +182,65 @@ export default function App() {
   const activeStage = ACADEMIC_STAGES.find(s => s.id === activeStageId) || ACADEMIC_STAGES[0];
 
   return (
-    <div className="min-h-screen bg-[#f6f7fb] dark:bg-[#0e1522] text-[#101a4f] dark:text-[#eef2f6] transition-colors duration-200">
+    <div className="min-h-screen bg-[#f6f7fb] dark:bg-[#0e1522] text-[#101a4f] dark:text-[#eef2f6] transition-colors duration-200 w-full max-w-full overflow-x-hidden">
       
       {/* 1. TOP UTILITY & COMPLIANCE BAR */}
-      <div className="bg-[#0c1760] text-white text-xs border-b border-blue-950">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-2 flex flex-wrap items-center justify-between gap-2">
-          <div className="flex items-center gap-2 text-blue-200 text-[11px] sm:text-xs">
+      <div className="bg-[#0c1760] text-white text-xs border-b border-blue-950 w-full max-w-full overflow-hidden">
+        <div className="max-w-7xl mx-auto px-3 sm:px-6 py-2 flex flex-wrap items-center justify-between gap-2">
+          <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 text-blue-200 text-[10px] sm:text-xs">
             <span className="font-semibold text-amber-400">Recognised by BOSEM</span>
             <span>·</span>
             <span>No. {SCHOOL_INFO.recognitionNo}</span>
+            <span>·</span>
+            <span className="text-amber-300 font-semibold">U-DISE: {SCHOOL_INFO.udiseCode}</span>
             <span>·</span>
             <span>Est. {SCHOOL_INFO.estYear}</span>
             <span className="hidden md:inline">·</span>
             <span className="hidden md:inline">{SCHOOL_INFO.address}</span>
           </div>
 
-          <div className="flex items-center gap-3 text-xs">
+          <div className="flex flex-wrap items-center gap-2 sm:gap-3 text-xs">
             <button 
               onClick={() => setIsDisclosureOpen(true)}
-              className="px-2.5 py-1 rounded bg-amber-400 text-slate-950 font-bold hover:bg-amber-300 transition-colors whitespace-nowrap"
+              className="px-2 py-0.5 sm:px-2.5 sm:py-1 rounded bg-amber-400 text-slate-950 font-bold hover:bg-amber-300 transition-colors whitespace-nowrap text-[11px] sm:text-xs"
             >
               Mandatory Disclosure
             </button>
             <button 
               onClick={() => setIsFeeCalcOpen(true)}
-              className="text-white hover:text-amber-300 transition-colors hidden sm:inline"
+              className="text-white hover:text-amber-300 transition-colors hidden sm:inline text-[11px] sm:text-xs"
             >
               Fee Calculator
             </button>
             <button 
               onClick={() => setIsYearlyDataOpen(true)}
-              className="text-white hover:text-amber-300 transition-colors hidden md:inline"
+              className="text-white hover:text-amber-300 transition-colors hidden md:inline text-[11px] sm:text-xs"
             >
               Yearly Data
             </button>
             {user ? (
               <button 
                 onClick={() => openPortalWithRole('admin')}
-                className="px-2.5 py-1 rounded bg-amber-400 text-slate-950 font-bold hover:bg-amber-300 transition-colors flex items-center gap-1.5"
+                className="px-2 py-0.5 sm:px-2.5 sm:py-1 rounded bg-amber-400 text-slate-950 font-bold hover:bg-amber-300 transition-colors flex items-center gap-1 text-[11px] sm:text-xs"
               >
-                <span>{isAdmin ? 'Admin Console' : (user.displayName || 'My Portal')}</span>
+                <span>{isAdmin ? 'Admin' : (user.displayName || 'Portal')}</span>
               </button>
             ) : (
-              <>
+              <div className="flex items-center gap-1.5 text-[11px] sm:text-xs">
                 <button 
                   onClick={() => openPortalWithRole('parent')}
                   className="text-white hover:text-amber-300 transition-colors"
                 >
                   Parent Login
                 </button>
+                <span className="text-white/40">·</span>
                 <button 
                   onClick={() => openPortalWithRole('staff')}
                   className="text-white hover:text-amber-300 transition-colors"
                 >
                   Staff Login
                 </button>
-              </>
+              </div>
             )}
             <div className="text-amber-300 font-bold hidden lg:flex items-center gap-1.5">
               <Phone className="w-3 h-3" />
@@ -251,12 +254,12 @@ export default function App() {
       </div>
 
       {/* 2. NEWS & UPDATES LIVE TICKER */}
-      <div className="bg-[#fbc81e] text-[#14213d] text-xs font-semibold overflow-hidden border-b border-amber-300 shadow-xs">
-        <div className="max-w-7xl mx-auto px-4 py-2 flex items-center gap-3">
+      <div className="bg-[#fbc81e] text-[#14213d] text-xs font-semibold overflow-hidden border-b border-amber-300 shadow-xs w-full max-w-full">
+        <div className="max-w-7xl mx-auto px-3 sm:px-4 py-2 flex items-center gap-2 sm:gap-3">
           <span className="shrink-0 px-2 py-0.5 rounded bg-[#c8161d] text-white text-[10px] font-bold uppercase tracking-wider">
             News & Updates
           </span>
-          <div className="overflow-hidden flex-1 relative whitespace-nowrap">
+          <div className="overflow-hidden flex-1 min-w-0 relative whitespace-nowrap">
             <div className="animate-marquee inline-block text-xs">
               {liveCirculars.length > 0 && liveCirculars.map(c => `📢 [${c.category}] ${c.title}: ${c.content}`).join(' ··· ') + ' ··· '}
               Admissions 2026–27 are open from Preparatory to Class X · Campus tours every Saturday 10:00 AM–3:00 PM · Monthly fees are due in advance or on/before the 10th of every month · Every fourth child of the same parent pays ZERO monthly tuition fee · Special Cash Awards: ₹ 20,000 for HSLC State Top 10 rankers & ₹ 2,000 per subject for Math & Science letter marks!
@@ -266,22 +269,22 @@ export default function App() {
       </div>
 
       {/* 3. PRIMARY NAVIGATION HEADER */}
-      <header className="sticky top-0 z-40 bg-white/95 dark:bg-[#162033]/95 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 transition-colors">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 h-20 flex items-center justify-between gap-6">
+      <header className="sticky top-0 z-40 bg-white/95 dark:bg-[#162033]/95 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 transition-colors w-full max-w-full">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 h-18 sm:h-20 flex items-center justify-between gap-3 sm:gap-6">
           {/* Brand Wordmark & Emblem */}
-          <a href="#" className="flex items-center gap-3 shrink-0 text-decoration-none group">
-            <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-red-600 shadow-sm bg-white shrink-0 flex items-center justify-center">
+          <a href="#" className="flex items-center gap-2.5 sm:gap-3 shrink-0 text-decoration-none group min-w-0">
+            <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full overflow-hidden border-2 border-red-600 shadow-sm bg-white shrink-0 flex items-center justify-center">
               <img 
                 src={EMBLEM_IMG} 
                 alt="Kinship High School Emblem" 
                 className="w-full h-full object-cover scale-110 group-hover:scale-125 transition-transform" 
               />
             </div>
-            <div>
-              <div className="font-editorial text-xl sm:text-2xl font-bold tracking-tight text-[#101a4f] dark:text-white leading-tight">
+            <div className="min-w-0">
+              <div className="font-editorial text-lg sm:text-2xl font-bold tracking-tight text-[#101a4f] dark:text-white leading-tight truncate sm:overflow-visible">
                 Kinship <span className="text-[#c8161d]">High School</span>
               </div>
-              <p className="text-[11px] font-medium text-slate-500 dark:text-slate-400 tracking-wide">
+              <p className="text-[10px] sm:text-[11px] font-medium text-slate-500 dark:text-slate-400 tracking-wide truncate">
                 Churachandpur, Manipur · Est. 1994
               </p>
             </div>
@@ -825,11 +828,11 @@ export default function App() {
               </h2>
 
               <p className="text-sm sm:text-base text-slate-700 dark:text-slate-300 leading-relaxed">
-                Kinship High School was established in 1994 in response to the deep communal and educational need to nurture and uplift children in Churachandpur. Children grow up here in an atmosphere that actively encourages co-existence, respect for the feelings and beliefs of others, and the breaking down of communal and caste barriers.
+                Kinship High School was established in 1994 in response to the deep communal and educational need to nurture and uplift children in Churachandpur. Under the dedicated stewardship of Head Teacher <strong>Pu Hemkholun Touthang</strong> and our 14 regular permanent faculty members, children grow up in an atmosphere that actively encourages co-existence, mutual respect, and academic excellence.
               </p>
 
               <p className="text-sm sm:text-base text-slate-700 dark:text-slate-300 leading-relaxed">
-                The school is run with faith in God and stands under the motto <em>spiritus, mens, corpus</em>: a soul that breathes peace, and a body of literature and learning. It provides education from preparatory to Class X and is officially recognised by the Board of Secondary Education, Manipur (BOSEM Recognition No. 68633/2012).
+                The school stands under the motto <em>spiritus, mens, corpus</em>: a soul that breathes peace, a mind of learning, and a sound body. We provide comprehensive education from preparatory to Class X, officially affiliated with the Board of Secondary Education Manipur (BOSEM No. {SCHOOL_INFO.recognitionNo}) and registered under the <strong>Rengkai Govt. H/s Cluster</strong> (National U-DISE Code: <strong>{SCHOOL_INFO.udiseCode}</strong>).
               </p>
 
               {/* Scripture quote */}
@@ -1278,7 +1281,7 @@ export default function App() {
                   <div className="flex items-center justify-between">
                     <span className="text-[11px] font-bold text-red-700 dark:text-red-400 uppercase tracking-wider flex items-center gap-1.5">
                       <span className="w-2 h-2 rounded-full bg-red-600 animate-pulse"></span>
-                      Live Circulars from Principal's Desk
+                      Official Circulars from Headmaster's Desk (Pu Hemkholun Touthang)
                     </span>
                     <span className="text-[10px] text-slate-500">Real-Time Cloud Broadcast</span>
                   </div>
@@ -1374,179 +1377,9 @@ export default function App() {
         </div>
       </section>
 
-      {/* 11. SCHOOL RULES & POLICIES (AUTHENTIC COMPLETE LIST) */}
-      <section id="rules" className="py-20 bg-white dark:bg-slate-900">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6">
-          <div className="text-center mb-12">
-            <span className="text-xs font-bold uppercase tracking-widest text-[#c8161d]">
-              Code of Conduct & Institutional Regulations
-            </span>
-            <h2 className="text-3xl sm:text-4xl font-bold font-editorial text-[#0c1760] dark:text-white mt-1">
-              School Rules, Policies & Awards
-            </h2>
-            <p className="text-sm text-slate-600 dark:text-slate-400 mt-2 max-w-2xl mx-auto">
-              Please read these carefully with your child. Parents and guardians are essential partners in maintaining the school’s high academic and moral standards.
-            </p>
-          </div>
-
-          {/* Search rules */}
-          <div className="mb-6">
-            <input
-              type="text"
-              value={rulesSearch}
-              onChange={(e) => setRulesSearch(e.target.value)}
-              placeholder="Search school rules, attendance, uniforms, hostel, awards..."
-              className="w-full px-4 py-3 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-sm focus:ring-2 focus:ring-[#0c1760] outline-none"
-            />
-          </div>
-
-          <div className="space-y-3">
-            {/* Rule 1: School Fees */}
-            <details className="group border border-slate-200 dark:border-slate-800 rounded-xl bg-slate-50 dark:bg-slate-800/50 p-4 transition-all" open>
-              <summary className="font-bold text-sm text-slate-900 dark:text-white cursor-pointer list-none flex justify-between items-center">
-                <span>1. Tuition Fees Schedule & Concession Policy</span>
-                <ChevronDown className="w-4 h-4 group-open:rotate-180 transition-transform text-slate-400" />
-              </summary>
-              <div className="pt-3 text-xs text-slate-600 dark:text-slate-300 space-y-2 border-t border-slate-200 dark:border-slate-700/60 mt-3 leading-relaxed">
-                <p>
-                  • School fees are charged for twelve (12) calendar months in full.
-                </p>
-                <p>
-                  • Monthly fees must be paid in advance or on/before the 10th of every month. Fees may be periodically reviewed by the Governing Body.
-                </p>
-                <p className="font-semibold text-emerald-700 dark:text-emerald-400">
-                  • Family Concession: Every fourth child of the same biological parent pays zero (0) monthly tuition fees throughout their tenure.
-                </p>
-              </div>
-            </details>
-
-            {/* Rule 2: 90% Attendance & Absence Fines */}
-            <details className="group border border-slate-200 dark:border-slate-800 rounded-xl bg-slate-50 dark:bg-slate-800/50 p-4 transition-all">
-              <summary className="font-bold text-sm text-slate-900 dark:text-white cursor-pointer list-none flex justify-between items-center">
-                <span>2. 90% Mandatory Attendance, Medical Leave & Absence Fines</span>
-                <ChevronDown className="w-4 h-4 group-open:rotate-180 transition-transform text-slate-400" />
-              </summary>
-              <div className="pt-3 text-xs text-slate-600 dark:text-slate-300 space-y-2 border-t border-slate-200 dark:border-slate-700/60 mt-3 leading-relaxed">
-                <ol className="list-decimal pl-5 space-y-1.5">
-                  <li>A regular student must maintain at least <strong>90% attendance</strong> across instructional school days.</li>
-                  <li>In case of sickness, submit a written application supported by a medical certificate to the Academic Dean.</li>
-                  <li><strong>Expulsion rule:</strong> A student absent for 5 consecutive days in a calendar month without approved permission will be struck off the rolls without notice.</li>
-                  <li>Students falling below 90% attendance cannot sit for the final promotion / board examination.</li>
-                </ol>
-
-                <div className="mt-3 p-3 bg-white dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-700">
-                  <strong className="block text-slate-900 dark:text-white font-semibold mb-1">
-                    Unexcused Absence Fine Schedule:
-                  </strong>
-                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 font-mono text-[11px]">
-                    {SCHOOL_RULES.attendanceFines.map((f, i) => (
-                      <div key={i} className="p-2 bg-slate-50 dark:bg-slate-800 rounded">
-                        <span className="block text-slate-500 font-sans text-[10px]">{f.tier}</span>
-                        <strong className="text-red-600">{f.fine}</strong>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </details>
-
-            {/* Rule 3: Student Do's */}
-            <details className="group border border-slate-200 dark:border-slate-800 rounded-xl bg-slate-50 dark:bg-slate-800/50 p-4 transition-all">
-              <summary className="font-bold text-sm text-slate-900 dark:text-white cursor-pointer list-none flex justify-between items-center">
-                <span>3. Code of Conduct: Do’s for Students (9 Core Standards)</span>
-                <ChevronDown className="w-4 h-4 group-open:rotate-180 transition-transform text-slate-400" />
-              </summary>
-              <div className="pt-3 text-xs text-slate-600 dark:text-slate-300 border-t border-slate-200 dark:border-slate-700/60 mt-3">
-                <ol className="list-decimal pl-5 space-y-1.5">
-                  {SCHOOL_RULES.dos.map((item, idx) => (
-                    <li key={idx} className="leading-relaxed">{item}</li>
-                  ))}
-                </ol>
-              </div>
-            </details>
-
-            {/* Rule 4: Student Don'ts */}
-            <details className="group border border-slate-200 dark:border-slate-800 rounded-xl bg-slate-50 dark:bg-slate-800/50 p-4 transition-all">
-              <summary className="font-bold text-sm text-slate-900 dark:text-white cursor-pointer list-none flex justify-between items-center">
-                <span>4. Prohibitions: Don’ts for Students (Mobiles, Gadgets & Conduct)</span>
-                <ChevronDown className="w-4 h-4 group-open:rotate-180 transition-transform text-slate-400" />
-              </summary>
-              <div className="pt-3 text-xs text-slate-600 dark:text-slate-300 border-t border-slate-200 dark:border-slate-700/60 mt-3">
-                <ol className="list-decimal pl-5 space-y-1.5">
-                  {SCHOOL_RULES.donts.map((item, idx) => (
-                    <li key={idx} className="leading-relaxed text-red-900/90 dark:text-red-200/90 font-medium">
-                      {item}
-                    </li>
-                  ))}
-                </ol>
-              </div>
-            </details>
-
-            {/* Rule 5: Disciplinary Measures */}
-            <details className="group border border-slate-200 dark:border-slate-800 rounded-xl bg-slate-50 dark:bg-slate-800/50 p-4 transition-all">
-              <summary className="font-bold text-sm text-slate-900 dark:text-white cursor-pointer list-none flex justify-between items-center">
-                <span>5. Disciplinary Sanctions & Zero-Tolerance Protocols</span>
-                <ChevronDown className="w-4 h-4 group-open:rotate-180 transition-transform text-slate-400" />
-              </summary>
-              <div className="pt-3 text-xs text-slate-600 dark:text-slate-300 space-y-1.5 border-t border-slate-200 dark:border-slate-700/60 mt-3 leading-relaxed">
-                <p>• Insubordination, disrespect toward faculty, communal provocation, or interfering in school governance invites immediate suspension or dismissal.</p>
-                <p>• Alcohol, narcotics, tobacco, smoking, and paan are strictly forbidden anytime, anywhere. Action: instant dismissal.</p>
-                <p>• Forging signatures and theft are severe offences resulting in expulsion without re-admission.</p>
-                <p>• Any physical damage to school desks, laboratory equipment, or library books must be compensated in full by the student concerned.</p>
-                <p>• Unauthorized unions, collection drives, and unsanctioned class picnics are strictly banned.</p>
-              </div>
-            </details>
-
-            {/* Rule 6: Awards Policy */}
-            <details className="group border border-slate-200 dark:border-slate-800 rounded-xl bg-slate-50 dark:bg-slate-800/50 p-4 transition-all">
-              <summary className="font-bold text-sm text-slate-900 dark:text-white cursor-pointer list-none flex justify-between items-center">
-                <span>6. Academic Awards, HSLC Cash Prizes & Topper Sponsorships</span>
-                <ChevronDown className="w-4 h-4 group-open:rotate-180 transition-transform text-slate-400" />
-              </summary>
-              <div className="pt-3 text-xs text-slate-600 dark:text-slate-300 space-y-2 border-t border-slate-200 dark:border-slate-700/60 mt-3">
-                {AWARDS_POLICY.map((award, i) => (
-                  <div key={i} className="p-3 bg-white dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-700 flex justify-between items-start gap-4">
-                    <div>
-                      <span className="font-bold text-slate-900 dark:text-white text-sm">{award.title}</span>
-                      <p className="text-[11px] text-slate-500 mt-0.5">{award.description}</p>
-                    </div>
-                    <span className="px-3 py-1 rounded bg-amber-100 dark:bg-amber-950 text-amber-900 dark:text-amber-300 font-mono font-bold text-xs whitespace-nowrap">
-                      {award.amount}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            </details>
-
-            {/* Rule 7: Hostel & Boarding 17 Rules */}
-            <details className="group border border-slate-200 dark:border-slate-800 rounded-xl bg-slate-50 dark:bg-slate-800/50 p-4 transition-all">
-              <summary className="font-bold text-sm text-slate-900 dark:text-white cursor-pointer list-none flex justify-between items-center">
-                <span>7. Comprehensive Boarding & Hostel Regulations (17 Official Rules)</span>
-                <ChevronDown className="w-4 h-4 group-open:rotate-180 transition-transform text-slate-400" />
-              </summary>
-              <div className="pt-3 text-xs text-slate-600 dark:text-slate-300 border-t border-slate-200 dark:border-slate-700/60 mt-3">
-                <ol className="list-decimal pl-5 space-y-2">
-                  {SCHOOL_RULES.hostelRules.map((rule, idx) => (
-                    <li key={idx} className="leading-relaxed">{rule}</li>
-                  ))}
-                </ol>
-              </div>
-            </details>
-
-            {/* Rule 8: Transfer Certificate */}
-            <details className="group border border-slate-200 dark:border-slate-800 rounded-xl bg-slate-50 dark:bg-slate-800/50 p-4 transition-all">
-              <summary className="font-bold text-sm text-slate-900 dark:text-white cursor-pointer list-none flex justify-between items-center">
-                <span>8. Transfer Certificate (TC) Issuance Guidelines</span>
-                <ChevronDown className="w-4 h-4 group-open:rotate-180 transition-transform text-slate-400" />
-              </summary>
-              <div className="pt-3 text-xs text-slate-600 dark:text-slate-300 space-y-1.5 border-t border-slate-200 dark:border-slate-700/60 mt-3 leading-relaxed">
-                <p>• Transfer certificate is issued exactly one (1) working day after receipt of written requisition from parent/guardian.</p>
-                <p>• An administrative fee of ₹ 1,000 applies.</p>
-                <p>• Students withdrawing mid-session must pay tuition fees for the full calendar year as per Board norms.</p>
-              </div>
-            </details>
-          </div>
-        </div>
+      {/* 11. SCHOOL RULES & POLICIES (DYNAMIC FILTERABLE ACCORDION) */}
+      <section id="rules" className="py-20 bg-white dark:bg-slate-900 scroll-mt-20">
+        <SchoolRulesSection />
       </section>
 
       {/* 12. PRAYERS & SCHOOL ANTHEM */}
@@ -2224,9 +2057,9 @@ export default function App() {
 
           <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-400">
             <p>
-              © 2026 Kinship High School, Churachandpur. All rights reserved. Recognised by BOSEM No. 68633/2012.
+              © 2026 Kinship High School, Churachandpur. All rights reserved. Recognised by BOSEM No. {SCHOOL_INFO.recognitionNo} · National U-DISE Code: {SCHOOL_INFO.udiseCode}.
             </p>
-            <div className="flex items-center gap-4">
+            <div className="flex flex-wrap items-center gap-3">
               <div className="flex items-center gap-2 mr-2">
                 <a
                   href="https://www.facebook.com/kinshiphighschool1994"
@@ -2256,6 +2089,16 @@ export default function App() {
                   <Youtube className="w-3.5 h-3.5" />
                 </a>
               </div>
+              <a
+                href={SCHOOL_INFO.udiseUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:text-amber-300 text-slate-300 transition-colors"
+                title="View official government registry on schools.org.in"
+              >
+                U-DISE Registry (14030100307)
+              </a>
+              <span>·</span>
               <button onClick={() => setIsDisclosureOpen(true)} className="hover:text-white">
                 Affiliation SAR
               </button>

@@ -11,7 +11,8 @@ import {
   where,
   Unsubscribe,
 } from 'firebase/firestore';
-import { db, handleFirestoreError, OperationType } from '../lib/firebase';
+import { ref, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage';
+import { db, storage, handleFirestoreError, OperationType } from '../lib/firebase';
 
 export interface AdmissionRecord {
   id: string;
@@ -108,6 +109,13 @@ export function subscribeAdmissions(
   isAdmin: boolean = false
 ): Unsubscribe {
   const path = 'admissions';
+
+  // Do not attempt query if not admin and not signed in as an applicant
+  if (!isAdmin && !userUid) {
+    callback([]);
+    return () => {};
+  }
+
   const colRef = collection(db, path);
   
   let q = query(colRef, orderBy('createdAt', 'desc'));
@@ -272,9 +280,17 @@ export async function deleteCircular(circularId: string): Promise<void> {
  * Subscribe to Saturday campus tour bookings (Admin only)
  */
 export function subscribeTourBookings(
-  callback: (bookings: TourBookingRecord[]) => void
+  callback: (bookings: TourBookingRecord[]) => void,
+  isAdmin: boolean = false
 ): Unsubscribe {
   const path = 'tour_bookings';
+
+  // Tour reservations are only accessible by school administrators
+  if (!isAdmin) {
+    callback([]);
+    return () => {};
+  }
+
   const colRef = collection(db, path);
   const q = query(colRef, orderBy('createdAt', 'desc'));
 
@@ -400,5 +416,130 @@ export async function deleteFacilityUpgrade(upgradeId: string): Promise<void> {
     handleFirestoreError(error, OperationType.DELETE, path);
   }
 }
+
+export interface GalleryPhotoRecord {
+  id: string;
+  title: string;
+  category: 'sports' | 'lab' | 'classrooms' | 'campus';
+  categoryLabel: string;
+  imgUrl: string;
+  caption: string;
+  highlight: string;
+  aspectClass?: string;
+  authorEmail?: string;
+  createdAt?: any;
+}
+
+/**
+ * Upload an image file to Firebase Storage with resilient fallback
+ */
+export async function uploadGalleryImage(file: File): Promise<string> {
+  const fileExt = file.name.split('.').pop() || 'jpg';
+  const cleanExt = fileExt.toLowerCase().replace(/[^a-z0-9]/g, '');
+  const fileName = `gallery_${Date.now()}_${Math.random().toString(36).substring(2, 7)}.${cleanExt || 'jpg'}`;
+  const storageRef = ref(storage, `campus_gallery/${fileName}`);
+
+  try {
+    const snapshot = await uploadBytes(storageRef, file, {
+      contentType: file.type || 'image/jpeg',
+    });
+    const downloadUrl = await getDownloadURL(snapshot.ref);
+    return downloadUrl;
+  } catch (storageError) {
+    console.warn('Firebase Storage direct upload note:', storageError);
+    // Resilient client-side fallback
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const result = e.target?.result as string;
+        if (result) {
+          resolve(result);
+        } else {
+          reject(new Error('Failed to read image file.'));
+        }
+      };
+      reader.onerror = () => reject(new Error('Failed to process image file.'));
+      reader.readAsDataURL(file);
+    });
+  }
+}
+
+/**
+ * Subscribe to real-time campus gallery photos (Public read)
+ */
+export function subscribeGalleryPhotos(
+  callback: (photos: GalleryPhotoRecord[]) => void
+): Unsubscribe {
+  const path = 'gallery_photos';
+  const colRef = collection(db, path);
+  const q = query(colRef, orderBy('createdAt', 'desc'));
+
+  return onSnapshot(
+    q,
+    (snapshot) => {
+      const items: GalleryPhotoRecord[] = [];
+      snapshot.forEach((docSnap) => {
+        items.push({
+          id: docSnap.id,
+          ...(docSnap.data() as Omit<GalleryPhotoRecord, 'id'>),
+        });
+      });
+      callback(items);
+    },
+    (error) => {
+      handleFirestoreError(error, OperationType.LIST, path);
+    }
+  );
+}
+
+/**
+ * Add a new gallery photo to Firestore (Admin only)
+ */
+export async function addGalleryPhoto(data: {
+  title: string;
+  category: GalleryPhotoRecord['category'];
+  categoryLabel: string;
+  imgUrl: string;
+  caption: string;
+  highlight: string;
+  aspectClass?: string;
+  authorEmail?: string;
+}): Promise<string> {
+  const collectionPath = 'gallery_photos';
+  const customId = `photo_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
+  const docRef = doc(db, collectionPath, customId);
+
+  const payload: Record<string, any> = {
+    title: data.title.trim().slice(0, 120),
+    category: data.category,
+    categoryLabel: data.categoryLabel.trim().slice(0, 60),
+    imgUrl: data.imgUrl.trim().slice(0, 3000),
+    caption: data.caption.trim().slice(0, 500),
+    highlight: data.highlight.trim().slice(0, 100),
+    aspectClass: data.aspectClass || 'aspect-[16/10]',
+    authorEmail: data.authorEmail ? data.authorEmail.slice(0, 100) : 'admin@kinship',
+    createdAt: serverTimestamp(),
+  };
+
+  try {
+    await setDoc(docRef, payload);
+    return customId;
+  } catch (error) {
+    handleFirestoreError(error, OperationType.CREATE, `${collectionPath}/${customId}`);
+  }
+}
+
+/**
+ * Delete a gallery photo from Firestore (Admin only)
+ */
+export async function deleteGalleryPhoto(photoId: string): Promise<void> {
+  const path = `gallery_photos/${photoId}`;
+  try {
+    await deleteDoc(doc(db, 'gallery_photos', photoId));
+  } catch (error) {
+    handleFirestoreError(error, OperationType.DELETE, path);
+  }
+}
+
 
 

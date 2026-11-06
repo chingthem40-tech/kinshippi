@@ -43,8 +43,12 @@ export const MandatoryDisclosureModal: React.FC<Props> = ({ isOpen, onClose }) =
               <h2 id="disclosure-title" className="text-xl font-bold font-editorial">
                 Mandatory Public Disclosure (SAR)
               </h2>
-              <p className="text-xs text-blue-200">
-                Board of Secondary Education Manipur (BOSEM) · Code: {SCHOOL_INFO.recognitionNo}
+              <p className="text-xs text-blue-200 flex flex-wrap items-center gap-1.5">
+                <span>BOSEM: {SCHOOL_INFO.recognitionNo}</span>
+                <span>·</span>
+                <span className="text-amber-300 font-bold">U-DISE: {SCHOOL_INFO.udiseCode}</span>
+                <span>·</span>
+                <span>Est. {SCHOOL_INFO.estYear}</span>
               </p>
             </div>
           </div>
@@ -78,17 +82,29 @@ export const MandatoryDisclosureModal: React.FC<Props> = ({ isOpen, onClose }) =
                   Certified Compliance Record (Updated Academic Year 2026–27)
                 </p>
                 <p className="text-xs text-amber-800/80 dark:text-amber-300/80">
-                  All institutional records, infrastructure safety certifications, teacher credentials, and financial audits are verified and open for public inspection.
+                  Verified with Ministry of Education National U-DISE Code: <strong className="font-bold text-amber-950 dark:text-amber-200">{SCHOOL_INFO.udiseCode}</strong> and BOSEM Recognition No. {SCHOOL_INFO.recognitionNo}. All institutional records are certified and open for public inspection.
                 </p>
               </div>
             </div>
-            <button
-              onClick={handleDownload}
-              className="px-4 py-2 bg-amber-500 hover:bg-amber-600 text-slate-950 text-xs font-bold rounded-lg transition-colors whitespace-nowrap shrink-0 flex items-center gap-1.5"
-            >
-              <Download className="w-4 h-4" />
-              {downloadSuccess ? "Document Generated!" : "Download Signed PDF"}
-            </button>
+            <div className="flex flex-wrap items-center gap-2 shrink-0">
+              <a
+                href={SCHOOL_INFO.udiseUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="px-3 py-2 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 hover:text-[#0c1760] dark:hover:text-amber-300 border border-slate-300 dark:border-slate-700 text-xs font-semibold rounded-lg transition-colors whitespace-nowrap flex items-center gap-1.5 shadow-xs"
+                title="View on schools.org.in"
+              >
+                <span>Govt Registry</span>
+                <span className="text-xs">↗</span>
+              </a>
+              <button
+                onClick={handleDownload}
+                className="px-4 py-2 bg-amber-500 hover:bg-amber-600 text-slate-950 text-xs font-bold rounded-lg transition-colors whitespace-nowrap flex items-center gap-1.5"
+              >
+                <Download className="w-4 h-4" />
+                {downloadSuccess ? "Document Generated!" : "Download Signed PDF"}
+              </button>
+            </div>
           </div>
 
           {/* Section 1: General Institutional Details */}
@@ -101,7 +117,19 @@ export const MandatoryDisclosureModal: React.FC<Props> = ({ isOpen, onClose }) =
               {MANDATORY_DISCLOSURE_DATA.generalInfo.map((item, idx) => (
                 <div key={idx} className="p-3 bg-slate-50 dark:bg-slate-800/60 rounded-lg border border-slate-200/80 dark:border-slate-800 flex flex-col">
                   <span className="text-xs font-medium text-slate-500 dark:text-slate-400">{item.label}</span>
-                  <span className="font-semibold text-slate-900 dark:text-slate-100 mt-0.5">{item.value}</span>
+                  {item.value.startsWith('http') ? (
+                    <a
+                      href={item.value}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="font-semibold text-blue-600 dark:text-blue-400 hover:underline mt-0.5 break-all flex items-center gap-1"
+                    >
+                      <span>{item.value}</span>
+                      <span className="text-xs">↗</span>
+                    </a>
+                  ) : (
+                    <span className="font-semibold text-slate-900 dark:text-slate-100 mt-0.5">{item.value}</span>
+                  )}
                 </div>
               ))}
             </div>

@@ -83,6 +83,19 @@ service cloud.firestore {
         (!('authorEmail' in data) || (data.authorEmail is string && data.authorEmail.size() <= 100));
     }
 
+    function isValidGalleryPhoto(data) {
+      return data.keys().hasAll(['title', 'category', 'categoryLabel', 'imgUrl', 'caption', 'highlight', 'createdAt']) &&
+        data.keys().hasOnly(['title', 'category', 'categoryLabel', 'imgUrl', 'caption', 'highlight', 'aspectClass', 'authorEmail', 'createdAt']) &&
+        data.title is string && data.title.size() >= 2 && data.title.size() <= 120 &&
+        data.category in ['sports', 'lab', 'classrooms', 'campus'] &&
+        data.categoryLabel is string && data.categoryLabel.size() <= 60 &&
+        data.imgUrl is string && data.imgUrl.size() >= 5 && data.imgUrl.size() <= 3000 &&
+        data.caption is string && data.caption.size() >= 5 && data.caption.size() <= 500 &&
+        data.highlight is string && data.highlight.size() <= 100 &&
+        (!('aspectClass' in data) || (data.aspectClass is string && data.aspectClass.size() <= 30)) &&
+        (!('authorEmail' in data) || (data.authorEmail is string && data.authorEmail.size() <= 100));
+    }
+
     function isValidUserProfile(data) {
       return data.keys().hasAll(['uid', 'email', 'role', 'createdAt']) &&
         data.keys().hasOnly(['uid', 'email', 'displayName', 'role', 'photoURL', 'createdAt']) &&
@@ -157,7 +170,23 @@ service cloud.firestore {
       allow delete: if isValidId(upgradeId) && isAdmin();
     }
 
-    // 5. USER PROFILES
+    // 6. GALLERY PHOTOS COLLECTION (Public read, admin managed)
+    match /gallery_photos/{photoId} {
+      allow get: if isValidId(photoId);
+      allow list: if true;
+      allow create: if isValidId(photoId) &&
+        isAdmin() &&
+        isValidGalleryPhoto(incoming()) &&
+        incoming().createdAt == request.time;
+      allow update: if isValidId(photoId) &&
+        isAdmin() &&
+        isValidGalleryPhoto(incoming()) &&
+        incoming().createdAt == existing().createdAt &&
+        incoming().diff(existing()).affectedKeys().hasOnly(['title', 'category', 'categoryLabel', 'imgUrl', 'caption', 'highlight', 'aspectClass']);
+      allow delete: if isValidId(photoId) && isAdmin();
+    }
+
+    // 7. USER PROFILES
     match /users/{userId} {
       allow get: if isValidId(userId) && isSignedIn() && (request.auth.uid == userId || isAdmin());
       allow list: if isAdmin();

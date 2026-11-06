@@ -36,51 +36,51 @@ export const ICON_CATALOG: Record<string, { label: string; icon: React.ElementTy
 // Initial default facility upgrades representing Kinship High School campus standards
 const DEFAULT_UPGRADES: Omit<FacilityUpgradeRecord, 'id'>[] = [
   {
-    title: 'Solar-Powered Continuous Hot Water',
+    title: 'Rooftop Solar Water Heating',
     category: 'Hostel Wing',
-    description: 'Rooftop solar thermal heating panels supplying clean, hot water daily to all boys and girls residential bathroom blocks.',
+    description: 'Clean solar thermal water heating installed for boys and girls residential blocks, providing warm water during the cold hill winters.',
     iconName: 'Sun',
-    badgeText: 'Eco-Friendly 2026',
+    badgeText: 'Winter Comfort',
     authorEmail: 'boichung094@gmail.com'
   },
   {
-    title: 'Dedicated Study Hall & 100% Inverter Backup',
+    title: 'Evening Study Hall with Inverter Backup',
     category: 'Study & Tech',
-    description: 'Evening supervised prep sessions (6:00 PM – 8:30 PM) with uninterrupted LED illumination and silent study carrels.',
+    description: 'Compulsory evening study prep (6:00 PM – 8:30 PM) under teacher supervision with inverter LED backup during local load-shedding.',
     iconName: 'Zap',
-    badgeText: '24/7 Power',
+    badgeText: 'Power Backup',
     authorEmail: 'boichung094@gmail.com'
   },
   {
-    title: 'Multi-Stage RO Pure Drinking Water Stations',
+    title: 'Clean Filtered Drinking Water Stations',
     category: 'Hygiene & Dining',
-    description: 'Industrial reverse-osmosis purifiers with regular certified water testing stations installed across dining and hostel floors.',
+    description: 'Multi-stage filtration units and hygienic storage reservoirs providing safe, clean drinking water across dining and dorm areas.',
     iconName: 'Droplets',
-    badgeText: 'Pure & Certified',
+    badgeText: 'Safe & Clean',
     authorEmail: 'boichung094@gmail.com'
   },
   {
-    title: 'Campus Perimeter CCTV & Biometric Dorm Gates',
+    title: 'Supervised Compound Gates & Warden Quarters',
     category: 'Safety & Health',
-    description: '24/7 security recording across dorm gates and entrances with residential warden supervision and strict visitor pass verification.',
+    description: 'Secure perimeter with resident wardens, evening roll calls, visitor logbooks, and verified gate-pass system for student safety.',
     iconName: 'ShieldCheck',
-    badgeText: 'High Security',
+    badgeText: '24/7 Supervision',
     authorEmail: 'boichung094@gmail.com'
   },
   {
-    title: 'Campus First-Aid Infirmary & Doctor On-Call',
+    title: 'First-Aid Medical Care & Doctor Protocol',
     category: 'Safety & Health',
-    description: 'Equipped medical rest room for unwell boarders with essential medicine stocks, emergency vehicle readiness, and doctor tie-up.',
+    description: 'Dedicated sick-bay with first-aid kits, essential medical supplies, and on-call transport arrangements with local Tuibong health centres.',
     iconName: 'HeartPulse',
-    badgeText: 'Nurse On-Site',
+    badgeText: 'Health Care',
     authorEmail: 'boichung094@gmail.com'
   },
   {
-    title: 'Indoor Table Tennis & Recreation Hall',
+    title: 'Boarders Recreation & Sports Kit',
     category: 'Sports & Rec',
-    description: 'Post-class recreation space featuring table tennis, carrom boards, chess, and outdoor badminton courts for weekend unwinding.',
+    description: 'Table tennis, carrom boards, chess sets, volleyball, and football kits for healthy weekend unwinding and inter-house sports.',
     iconName: 'Dumbbell',
-    badgeText: 'New Facility',
+    badgeText: 'Recreation',
     authorEmail: 'boichung094@gmail.com'
   }
 ];

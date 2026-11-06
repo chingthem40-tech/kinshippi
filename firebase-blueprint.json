@@ -213,6 +213,62 @@
       },
       "required": ["title", "category", "description", "iconName", "createdAt"]
     },
+    "GalleryPhoto": {
+      "title": "Campus Gallery Photograph",
+      "description": "Campus life, sports, laboratory, and classroom photographs uploaded by school admin",
+      "type": "object",
+      "properties": {
+        "title": {
+          "type": "string",
+          "description": "Title or headline of the photo moment",
+          "minLength": 2,
+          "maxLength": 120
+        },
+        "category": {
+          "type": "string",
+          "description": "Gallery classification",
+          "enum": ["sports", "lab", "classrooms", "campus"]
+        },
+        "categoryLabel": {
+          "type": "string",
+          "description": "Human-readable label for category",
+          "maxLength": 60
+        },
+        "imgUrl": {
+          "type": "string",
+          "description": "Firebase Storage or web image URL",
+          "minLength": 5,
+          "maxLength": 3000
+        },
+        "caption": {
+          "type": "string",
+          "description": "Detailed caption describing student activity",
+          "minLength": 5,
+          "maxLength": 500
+        },
+        "highlight": {
+          "type": "string",
+          "description": "Short badge highlight or milestone",
+          "maxLength": 100
+        },
+        "aspectClass": {
+          "type": "string",
+          "description": "Aspect ratio CSS class (e.g. aspect-[16/10])",
+          "maxLength": 30
+        },
+        "authorEmail": {
+          "type": "string",
+          "description": "Email of admin who uploaded the photo",
+          "maxLength": 100
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Upload timestamp"
+        }
+      },
+      "required": ["title", "category", "categoryLabel", "imgUrl", "caption", "highlight", "createdAt"]
+    },
     "UserProfile": {
       "title": "User Profile",
       "description": "Public profile info for authenticated parents and faculty members",
@@ -263,6 +319,10 @@
     "/facility_upgrades/{upgradeId}": {
       "schema": "FacilityUpgrade",
       "description": "Collection of dynamic hostel and amenity highlights managed by admin"
+    },
+    "/gallery_photos/{photoId}": {
+      "schema": "GalleryPhoto",
+      "description": "Collection of dynamic campus life photos uploaded to Storage by admin"
     },
     "/users/{userId}": {
       "schema": "UserProfile",

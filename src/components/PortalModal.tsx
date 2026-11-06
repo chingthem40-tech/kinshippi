@@ -82,15 +82,28 @@ export const PortalModal: React.FC<Props> = ({ isOpen, onClose, initialRole = 'p
   useEffect(() => {
     if (!isOpen) return;
 
-    const unsubAdmissions = subscribeAdmissions(
-      (records) => setAdmissions(records),
-      user?.uid,
-      isAdmin
-    );
-
+    // 1. Circulars (Publicly accessible official notices)
     const unsubCirculars = subscribeCirculars((records) => setLiveCirculars(records));
 
-    const unsubTours = subscribeTourBookings((records) => setTours(records));
+    // 2. Admissions (Admins see all; signed-in parents see their own applications)
+    let unsubAdmissions = () => {};
+    if (isAdmin || user?.uid) {
+      unsubAdmissions = subscribeAdmissions(
+        (records) => setAdmissions(records),
+        user?.uid,
+        isAdmin
+      );
+    } else {
+      setAdmissions([]);
+    }
+
+    // 3. Tour bookings (Administrative dashboard only)
+    let unsubTours = () => {};
+    if (isAdmin) {
+      unsubTours = subscribeTourBookings((records) => setTours(records), true);
+    } else {
+      setTours([]);
+    }
 
     return () => {
       unsubAdmissions();
@@ -562,7 +575,8 @@ export const PortalModal: React.FC<Props> = ({ isOpen, onClose, initialRole = 'p
                       <span>Term Evaluation Marks Breakdown (BOSEM Rubric)</span>
                       <span className="text-[11px] text-slate-500">Grading scale: A1 to D</span>
                     </div>
-                    <table className="w-full text-left text-xs">
+                    <div className="overflow-x-auto">
+                      <table className="w-full text-left text-xs min-w-[500px] sm:min-w-full">
                       <thead className="bg-slate-50 dark:bg-slate-800/40 text-slate-600 dark:text-slate-400 border-b border-slate-200 dark:border-slate-800">
                         <tr>
                           <th className="py-2.5 px-3">Subject</th>
@@ -608,6 +622,7 @@ export const PortalModal: React.FC<Props> = ({ isOpen, onClose, initialRole = 'p
                         </tr>
                       </tbody>
                     </table>
+                    </div>
                   </div>
 
                   {/* Fee receipt download */}
@@ -800,13 +815,13 @@ export const PortalModal: React.FC<Props> = ({ isOpen, onClose, initialRole = 'p
                 <div>
                   <div className="flex items-center gap-2 mb-1">
                     <Database className="w-5 h-5 text-amber-400" />
-                    <h3 className="font-bold text-base">Live Firebase Cloud Console</h3>
+                    <h3 className="font-bold text-base">Headmaster & Administration Dashboard</h3>
                     <span className="px-2 py-0.5 rounded bg-emerald-500/20 border border-emerald-400 text-emerald-300 text-[10px] font-bold">
-                      Connected to Firestore
+                      Official Records
                     </span>
                   </div>
                   <p className="text-xs text-blue-200">
-                    Real-time admissions, tour requests, and public notice dispatcher.
+                    Real-time online admissions register, campus tour reservations, and official circular dispatcher.
                   </p>
                 </div>
 
